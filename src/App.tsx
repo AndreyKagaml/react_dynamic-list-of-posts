@@ -20,16 +20,7 @@ export const App = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
 
-  // const getUserIdFromHash = () => {
-  //   const hash = window.location.hash.replace('#user-', '');
-
-  //   return hash ? +hash : null;
-  // };
-
-  const [currentUserId, setCurrentUserId] = useState<number | null>(
-    //getUserIdFromHash,
-    null,
-  );
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const selectedUser = users.find(user => user.id === currentUserId) ?? null;
 
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
@@ -40,7 +31,9 @@ export const App = () => {
 
   useEffect(() => {
     setIsError(false);
-    getUsers().then(response => setUsers(response));
+    getUsers()
+      .then(response => setUsers(response))
+      .catch(() => setIsError(true));
   }, []);
 
   useEffect(() => {

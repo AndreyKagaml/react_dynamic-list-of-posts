@@ -14,7 +14,7 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
   const [isError, setIsError] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
 
-  const [avaliableNewComment, setAvaliableNewComment] = useState(false);
+  const [availableNewComment, setAvailableNewComment] = useState(false);
 
   const successfulLoading = !loading && !isError;
 
@@ -23,13 +23,13 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
   };
 
   const handleDeleteComment = (commentId: number) => {
-    deleteComment(commentId);
+    deleteComment(commentId).catch(() => setIsError(true));
     setComments([...comments].filter(comment => comment.id !== commentId));
   };
 
   useEffect(() => {
     setIsError(false);
-    setAvaliableNewComment(false);
+    setAvailableNewComment(false);
     setComments([]);
     if (post) {
       setLoading(true);
@@ -43,6 +43,11 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
   if (!post) {
     return null;
   }
+
+  const handleFormError = () => {
+    setAvailableNewComment(false);
+    setIsError(true);
+  };
 
   return (
     <div className="content" data-cy="PostDetails">
@@ -103,12 +108,12 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
                 </p>
               )}
 
-              {!avaliableNewComment && (
+              {!availableNewComment && (
                 <button
                   data-cy="WriteCommentButton"
                   type="button"
                   className="button is-link"
-                  onClick={() => setAvaliableNewComment(true)}
+                  onClick={() => setAvailableNewComment(true)}
                 >
                   Write a comment
                 </button>
@@ -117,8 +122,12 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
           )}
         </div>
 
-        {avaliableNewComment && (
-          <NewCommentForm postId={post.id} onAddComment={handleAddComment} />
+        {availableNewComment && (
+          <NewCommentForm
+            postId={post.id}
+            onAddComment={handleAddComment}
+            handleError={handleFormError}
+          />
         )}
       </div>
     </div>

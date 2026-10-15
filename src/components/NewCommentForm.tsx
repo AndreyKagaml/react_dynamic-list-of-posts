@@ -6,9 +6,14 @@ import { Comment } from '../types/Comment';
 interface Props {
   postId: number;
   onAddComment: (newComment: Comment) => void;
+  handleError: () => void;
 }
 
-export const NewCommentForm: React.FC<Props> = ({ postId, onAddComment }) => {
+export const NewCommentForm: React.FC<Props> = ({
+  postId,
+  onAddComment,
+  handleError,
+}) => {
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState(false);
 
@@ -22,21 +27,14 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onAddComment }) => {
 
   const onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    setNameError(false);
-    setEmailError(false);
-    setTextError(false);
+    const nameIsEmpty = !name.trim();
+    const emailIsEmpty = !email.trim();
+    const textIsEmpty = !text.trim();
 
-    if (!name.trim()) {
-      setNameError(true);
-    }
-
-    if (!email.trim()) {
-      setEmailError(true);
-    }
-
-    if (!text.trim()) {
-      setTextError(true);
-
+    setNameError(nameIsEmpty);
+    setEmailError(emailIsEmpty);
+    setTextError(textIsEmpty);
+    if (nameIsEmpty || emailIsEmpty || textIsEmpty) {
       return;
     }
 
@@ -53,9 +51,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onAddComment }) => {
         onAddComment(response);
         setText('');
       })
-      .catch(error => {
-        throw error;
-      })
+      .catch(handleError)
       .finally(() => {
         setIsSaving(false);
       });
@@ -75,10 +71,10 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onAddComment }) => {
   const handleFieldChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     setValue: React.Dispatch<React.SetStateAction<string>>,
-    handleError: React.Dispatch<React.SetStateAction<boolean>>,
+    handleFieldError: React.Dispatch<React.SetStateAction<boolean>>,
   ) => {
     setValue(event.target.value);
-    handleError(false);
+    handleFieldError(false);
   };
 
   return (
